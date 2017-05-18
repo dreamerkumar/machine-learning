@@ -13210,7 +13210,10 @@ rkwb6QZuHd1wIiI6ziSShyM6Uq4ARUREREREx8iPIERERERERMdIBygiIiIiIjpGOkAREREREdEx
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Answer: </strong>I choose the graph with max_depth=1. The score of the training curve converges to about .4 as more and more training data is added. The testing curve also seems to eventually converge to .4. Probably no benefit of increasing the training data as far as the score is concerned. It seems to stabilize at a score of .4. The model is not complex enough to learn from more data and give better results. But the variance does seem to reduce for higher training data, so it is still useful to add more training data.</p>
+<p><strong>Answer: </strong>I choose the graph with max_depth=1.</p>
+<p>For this max_depth, initially the training set starts with a score of 1.0. But the testing score starts close to 0.</p>
+<p>As we increase the number of training points, there is some improvement. The training set score decreases and the test set score increases. With this balancing of the two scores, there is an overall improvement in the model as we increase the training points.</p>
+<p>The score of the training curve converges to about .4 as more and more training data is added. The testing curve also seems to eventually converge to .4. There is no benefit of increasing the training data beyond this point.</p>
 
 </div>
 </div>
@@ -13666,7 +13669,11 @@ xpigYUnPGGNM0LCkZ4wxJmj8P3SxwXl3psutAAAAAElFTkSuQmCC
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Answer: </strong> It suffers from high bias at the the depth of 1. At 10, it has a high variance.</p>
+<p><strong>Answer: </strong> High bias at 1. High variance at 10.</p>
+<p>At 1:<br>
+At 1 the score is close to .4 for both the training and the testing set. This is the lowest score for both sets. A low score indicates that the overall prediction of the model is way off from actual values. So it suffers from high bias at the the depth of 1. But since the scores of the trainig and validation sets are closer together, it indicates that we experience low variance.</p>
+<p>At 10:<br>
+At 10 there is improvement in the score. Test scores are above .6. In other words, the predictions are closer to the actual values. This means there is low bias. But the training and validation scores are far apart. Which is indicative of a high variance.</p>
 
 </div>
 </div>
@@ -13717,7 +13724,8 @@ xpigYUnPGGNM0LCkZ4wxJmj8P3SxwXl3psutAAAAAElFTkSuQmCC
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Answer: </strong>Grid search can be used to figure out the right combination of parameters for the best fit model. The parameters are laid out on a grid and we try out different combination of values for the model. We can use cross validation to know the fitness of each model and then select the one with the best fit.</p>
+<p><strong>Answer: </strong>Grid search can be used to figure out the right combination of parameters for the best fit model. For each parameter that we need to optimize, we come up with a discrete set of values for it. The model will be tested for each combination of these values. For e.g. if there are two parameters with 2 and 4 specified values, the grid will try out 2 times 4 values.</p>
+<p>We can use cross validation to know the fitness of each model and then select the one with the best fit.</p>
 
 </div>
 </div>
@@ -13738,7 +13746,12 @@ xpigYUnPGGNM0LCkZ4wxJmj8P3SxwXl3psutAAAAAElFTkSuQmCC
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Answer: </strong>In k fold we split the data into a number of bins (k bins). Then we pick a bin as the test data set. We train the model using the rest of the bins. We repeat this process k times using each bin as the testing data set. This technique can be used for cross validating each model in the grid. Splitting the data into bins and using each bin as test data helps generalize the model over different values of the data which helps reduce the bias in each model.</p>
+<p><strong>Answer: </strong>In k fold we split the data into a number of bins (k bins).</p>
+<p>Then we pick a bin as the test data set. We train the model using the rest of the bins and then test against this bin. We make a note of the error rate for this bin.</p>
+<p>We repeat this process k times using each bin as the testing data set.</p>
+<p>Then we average out the error rates obtained for each bin.</p>
+<p>That average error rate is compared for different models, and the one with the lowest error rate is chosen as the best fit model for the given data.</p>
+<p>Splitting the data into bins and using each bin as test data helps generalize the model output over different values of the data which helps reduce the variance in each model. We don't just get the best fit for a given set. By using different test sets, we get the best model for a generalized case.</p>
 
 </div>
 </div>
@@ -13961,7 +13974,10 @@ Predicted selling price for Client 3&#39;s home: $931,636.36
 <p><strong>Answer: </strong> Based on the min, max and mean price obtained before, I would recommend client 2 to sell in the lower range of 100k to 200k.<br>
 Client 1 to sell in the middle range (400k to 500k).<br>
 And client 3 to sell in the higher range (900k to 1million)</p>
-<p>This is by observing the 3 features of there houses. Client 2 has feature values that negatively impact the price while client 3 has feature values that positively impact price. Client 1 seems to have the average values.</p>
+<p>This is by observing the 3 features of there houses.</p>
+<p>Client 2 has an RM value of 4, an LSTAT value of 32% and PTRATIO of 22. Higher LSTAT and PTRATIO values have lower MEDV values. If he had a high RM value (that increases the MEDV), then it might offset the price, but is it also not very high. Therefore, his price should fall in the low range.</p>
+<p>Client 3 has a very high RM of 8 (should increase the MEDV). His LSTAT and PTRATIO are also quite low. Their low values also favor high MEDV. So he should definitely sell in the higher range.</p>
+<p>Client 1 has a good RM of 5. And LSTAT of 17% and PTRATIO of 15 also lie somewhere in the middle. So his MEDV should be around the middle value.</p>
 <p>Predicted selling price for Client 1 home is \$403,025.00  
 Predicted selling price for Client 2 home is \$237,478.72<br>
 Predicted selling price for Client 3 home is \$931,636.36</p>
