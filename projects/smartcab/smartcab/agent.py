@@ -9,7 +9,7 @@ class LearningAgent(Agent):
     """ An agent that learns to drive in the Smartcab world.
         This is the object you will be modifying. """ 
 
-    def __init__(self, env, learning=False, epsilon=1.0, alpha=0.5):
+    def __init__(self, env, learning=False, epsilon=1.0, alpha=0.001):
         super(LearningAgent, self).__init__(env)     # Set the agent in the evironment 
         self.planner = RoutePlanner(self.env, self)  # Create a route planner
         self.valid_actions = self.env.valid_actions  # The set of valid actions
@@ -19,21 +19,33 @@ class LearningAgent(Agent):
         self.Q = dict()          # Create a Q-table which will be a dictionary of tuples
         self.epsilon = epsilon   # Random exploration factor
         self.alpha = alpha       # Learning factor
-
+        self.train_test_iteration = 0
+        self.a = .999
         ###########
         ## TO DO ##
         ###########
         # Set any additional class parameters as needed
         self.prev_state = None
 
+    def decay_epsilon(self, testing):
+        if testing:
+            self.epsilon = 0
+            self.alpha = 0
+        else:
+            self.epsilon = np.power(self.a, self.train_test_iteration)
+            # self.epsilon = 1.0 - 1.0/np.power(self.train_test_iteration, 1)
+            #self.epsilon = 1.0/np.power(self.train_test_iteration, 2)
+            # self.epsilon = np.exp(-1.0*self.a*self.train_test_iteration)
 
     def reset(self, destination=None, testing=False):
         """ The reset function is called at the beginning of each trial.
             'testing' is set to True if testing trials are being used
             once training trials have completed. """
 
+        self.train_test_iteration = self.train_test_iteration + 1
         # Select the destination as the new location to route to
         self.planner.route_to(destination)
+
         
         ###########
         ## TO DO ##
@@ -41,13 +53,7 @@ class LearningAgent(Agent):
         # Update epsilon using a decay function of your choice
         # Update additional class parameters as needed
         # If 'testing' is True, set epsilon and alpha to 0
-        if testing is True:
-            self.epsilon = 0
-            self.alpha = 0
-        else:
-            decay = 0.05
-            if self.epsilon >= decay:
-                self.epsilon = self.epsilon - decay
+        self.decay_epsilon(testing)
         return None
 
     def build_state(self):
@@ -228,14 +234,14 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
-    sim = Simulator(env, log_metrics=True, update_delay=0.01)
+    sim = Simulator(env, log_metrics=True, update_delay=0.01, optimized=True)
     
     ##############
     # Run the simulator
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=10)
+    sim.run(n_test=10, tolerance = .0005)
 
 
 if __name__ == '__main__':
