@@ -25,7 +25,6 @@ class LearningAgent(Agent):
         ## TO DO ##
         ###########
         # Set any additional class parameters as needed
-        self.prev_state = None
 
     def decay_epsilon(self, testing):
         if testing:
@@ -83,15 +82,7 @@ class LearningAgent(Agent):
         ## TO DO ##
         ###########
         # Calculate the maximum Q-value of all actions for a given state
-        maxQ = None
-        all_Q_values_for_state = self.Q[state]
-        for action, Q_value in all_Q_values_for_state.items():
-            if maxQ == None:
-                maxQ = Q_value
-            else:
-                if Q_value > maxQ:
-                    maxQ = Q_value
-        return maxQ 
+        return max(self.Q[state].values()) 
 
 
     def createQ(self, state):
@@ -103,15 +94,14 @@ class LearningAgent(Agent):
         # When learning, check if the 'state' is not in the Q-table
         # If it is not, create a new dictionary for that state
         #   Then, for each action available, set the initial Q-value to 0.0
-        if not state in self.Q:
+        if self.learning and not state in self.Q:
             self.Q[state] = dict()
             for action in self.valid_actions:
                 self.Q[state][action] = 0.0
         return
 
     def get_random_valid_action(self):
-        index = random.randint(0, len(self.valid_actions)-1)
-        return self.valid_actions[index]
+        return random.choice(self.valid_actions)
 
     def choose_action(self, state):
         """ The choose_action function is called when the agent is asked to choose
@@ -134,9 +124,14 @@ class LearningAgent(Agent):
                 action = self.get_random_valid_action()
             else:
                 max_Q = self.get_maxQ(state)
+                matching_actions = []
                 for state_action, Q_value in self.Q[state].items():
                     if Q_value == max_Q:
-                        action = state_action
+                        matching_actions.append(state_action)
+                if len(matching_actions) == 1:
+                    return matching_actions[0]
+                else:
+                    return random.choice(matching_actions)
         else:
             action = self.get_random_valid_action()
         return action
@@ -157,30 +152,9 @@ class LearningAgent(Agent):
         # state, action, will result in reward and new state
         # 
         if self.learning is True:
-
-            # to do q iteration, we need the two states, initial and final ref: http://artint.info/html/ArtInt_265.html
-            # this function is only being passed state, action and reward and not the next state which is a problem
-            # so we can do the update the second time
-            # we can store the state, action, value as previous
-            # and when called the next time, we will now have two states (previous and next)
-            # so we can easily use the q iteration formula
-
-            if not self.prev_state is None:
-                prev_Q = self.Q[self.prev_state][self.prev_action]
-                self.Q[self.prev_state][self.prev_action] = prev_Q + self.alpha*( (self.prev_reward + self.get_maxQ(state)) - prev_Q)
-            else:
-                # use a modified formula for the q update
-                current_value = self.Q[state][action]
-                learned_value = reward + self.get_maxQ(state)
-                delta = learned_value - current_value
-                learned_delta = self.alpha*delta
-
-                new_q_value = current_value + learned_delta
-                self.Q[state][action] = new_q_value
-
-            self.prev_state = state
-            self.prev_action = action
-            self.prev_reward = reward
+           # ref: http://artint.info/html/ArtInt_265.html
+            current_value = self.Q[state][action]
+            self.Q[state][action] = current_value + self.alpha*(reward - current_value)
         return
 
 
