@@ -124,14 +124,8 @@ class LearningAgent(Agent):
                 action = self.get_random_valid_action()
             else:
                 max_Q = self.get_maxQ(state)
-                matching_actions = []
-                for state_action, Q_value in self.Q[state].items():
-                    if Q_value == max_Q:
-                        matching_actions.append(state_action)
-                if len(matching_actions) == 1:
-                    return matching_actions[0]
-                else:
-                    return random.choice(matching_actions)
+                best_actions = [action for action in self.valid_actions if self.Q[state][action] == max_Q]
+                action = random.choice(best_actions)
         else:
             action = self.get_random_valid_action()
         return action
